@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 
-MSYS2_REPO="/c/Users/SvrakaA/Downloads/msys2"
-MINGW_PACKAGES="gcc gcc-libs crt-git headers-git libmangle-git tools-git winpthreads-git libwinpthread-git winstorecompat-git"
-EMACS_BIN="mingw-w64-emacs/pkg/$MINGW_PACKAGE_PREFIX-emacs$MINGW_PREFIX/bin/emacs"
-ELISP_TEST_LIBRARY="../MINGW-packages-16190/test.el"
-ELISP_TEST_FUNCTION="test-subprocesses"
-ELISP_TEST_OUTPUT="../MINGW-packages-16190/res"
+source .env
 
 get_package_version() {
     local PACKAGE="$1"
