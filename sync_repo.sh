@@ -19,7 +19,11 @@ generate_filter_file() {
 TEMPFILE=$(mktemp)
 generate_filter_file > "$TEMPFILE"
 
-rsync -rlptH --safe-links --delete-delay --delay-updates \
-      --human-readable --verbose --progress \
-      --filter="merge $TEMPFILE" \
-      rsync://repo.msys2.org/builds/ "$MSYS2_REPO"
+RSYNC_ARGS=(-rlptH --safe-links --delete-delay --delay-updates
+            --human-readable --verbose --progress
+            --filter="merge $TEMPFILE")
+if [ "$1" == "--dry-run" ]; then
+    RSYNC_ARGS+=("--dry-run")
+fi
+
+rsync "${RSYNC_ARGS[@]}" rsync://repo.msys2.org/builds/ "$MSYS2_REPO"
