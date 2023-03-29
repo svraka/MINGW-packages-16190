@@ -4,8 +4,9 @@ SCRIPT_DIR="$(dirname "$BASH_SOURCE")"  # relative
 SCRIPT_DIR="$(cd "$SCRIPT_DIR" && pwd)" # absolutized and normalized
 
 source "${SCRIPT_DIR}/.env"
+source "${SCRIPT_DIR}/lib.sh"
 
-MINGW_PACKAGES="emacs ${MINGW_PACKAGES}"
+MINGW_PACKAGES=$(get_recursive_package_makedeps emacs | sed -e "s/$MINGW_PACKAGE_PREFIX-//g")
 
 generate_filter_file() {
     echo "- /distrib"
