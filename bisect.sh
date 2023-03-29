@@ -34,7 +34,7 @@ main() {
     install_current_makedeps emacs
     build_emacs
     RES=$(test_emacs)
-    git clean -d -f 
+    git clean -d -f
     exit $RES
 }
 
