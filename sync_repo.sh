@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-source .env
+SCRIPT_DIR="$(dirname "$BASH_SOURCE")"  # relative
+SCRIPT_DIR="$(cd "$SCRIPT_DIR" && pwd)" # absolutized and normalized
+
+source "${SCRIPT_DIR}/.env"
 
 MINGW_PACKAGES="emacs ${MINGW_PACKAGES}"
 

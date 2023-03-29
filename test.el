@@ -10,4 +10,4 @@
   ;; would work on unix-like.
   (write-region (number-to-string (length (process-list)))
                 nil
-                "../MINGW-packages-16190/res"))
+                "res"))
