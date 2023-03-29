@@ -7,9 +7,9 @@ MINGW_PACKAGES="emacs ${MINGW_PACKAGES}"
 generate_filter_file() {
     echo "- /distrib"
     echo "- /msys"
-    for p in $MINGW_EXCLUDED_DIRS; do echo "- /mingw/$p"; done
+    for p in $MINGW_EXCLUDED_ENVIRONMENTS; do echo "- /mingw/$p"; done
     for p in $MINGW_PACKAGES; do echo "+ **/mingw*-$p-*.zst"; done
-    for p in $MINGW_INCLUDED_DIRS; do echo "- /mingw/$p/*"; done
+    for p in $MINGW_INCLUDED_ENVIRONMENTS; do echo "- /mingw/$p/*"; done
     echo "- *.sig"
 }
 
