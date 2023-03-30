@@ -1,3 +1,11 @@
+pushd () {
+    command pushd "$@" > /dev/null
+}
+
+popd () {
+    command popd "$@" > /dev/null
+}
+
 get_pkgbuild_name() {
     PACKAGE="$1"
     case $PACKAGE in
