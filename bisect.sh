@@ -18,6 +18,10 @@ test_emacs() {
     else
         EMACS_BIN="$1"
     fi
+    if [ ! -e "$EMACS_BIN" ]; then
+        echo "$EMACS_BIN does not exist" >&2
+        exit 1
+    fi
     ELISP_TEST_OUTPUT=res
 
     pushd "$SCRIPT_DIR"
@@ -27,13 +31,14 @@ test_emacs() {
     rm -f "$ELISP_TEST_OUTPUT"
     popd
 
-    echo $RES
+    exit $RES
 }
 
 main() {
     install_current_makedeps emacs
     build_emacs
-    RES=$(test_emacs)
+    test_emacs
+    RES="$?"
     git clean -d -f
     exit $RES
 }
