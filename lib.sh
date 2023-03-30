@@ -1,4 +1,4 @@
-get_pkgbuild_file() {
+get_pkgbuild_name() {
     PACKAGE="$1"
     case $PACKAGE in
         crt)
@@ -13,7 +13,32 @@ get_pkgbuild_file() {
         libtre)
             PACKAGE="libtre-git"
             ;;
+        *)
+            PACKAGE=$PACKAGE
+            ;;
     esac
+    echo "$PACKAGE"
+}
+
+translate_provides() {
+    PACKAGE="$1"
+    case $PACKAGE in
+        cc)
+            PACKAGE="gcc"
+            ;;
+        crt|libtre|libwinpthread|winpthreads)
+            PACKAGE="${PACKAGE}-git"
+            ;;
+        *)
+            PACKAGE=$PACKAGE
+            ;;
+    esac
+    echo "$PACKAGE"
+}
+
+get_pkgbuild_file() {
+    PACKAGE="$1"
+    PACKAGE=$(get_pkgbuild_name "$PACKAGE")
     echo "mingw-w64-$PACKAGE/PKGBUILD"
 }
 
@@ -54,11 +79,13 @@ install_packages_from_current_revision() {
     PACKAGES="$1"
     declare -a PACKAGE_TARBALLS
     for p in $PACKAGES; do
-        VERSION=$(get_package_version $p)
+        p=$(translate_provides "$p")
+        VERSION=$(get_package_version "$p")
         TARBALL=$(printf "%s/mingw%s/%s-$p-%s-any.pkg.tar.zst" "$MSYS2_REPO" "$MINGW_PREFIX" "$MINGW_PACKAGE_PREFIX" "$VERSION")
         if [ -e "$TARBALL" ]; then
             PACKAGE_TARBALLS+=("$TARBALL")
         else
+            echo "Tarball not found: $TARBALL"
             exit 125
         fi
     done
