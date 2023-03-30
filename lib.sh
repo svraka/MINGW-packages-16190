@@ -46,7 +46,7 @@ get_package_makedeps() {
     PKGBUILD=$(get_pkgbuild_file "$1")
     MAKEDEPS=$(source "$PKGBUILD" && MAKEDEPS=("${depends[@]}" "${makedepends[@]}") && echo "${MAKEDEPS[@]}" | tr ' ' '\n')
     # Let's not deal with MSYS packages
-    MAKEDEPS=$(echo "${MAKEDEPS[@]}" | grep "^${MINGW_PACKAGE_PREFIX}-")
+    MAKEDEPS=$(echo "${MAKEDEPS}" | grep "^${MINGW_PACKAGE_PREFIX}-")
     echo "${MAKEDEPS}"
 }
 
@@ -56,7 +56,7 @@ get_recursive_package_makedeps() {
     declare -a ALLDEPS
     for p in ${MAKEDEPS}; do
         PACKAGE_DEPS=$(pactree -u $p)
-        IFS=$'\r\n' read -d "\034" -r -a PACKAGE_DEPS <<<"${PACKAGE_DEPS}\034"
+        read -d "\034" -r -a PACKAGE_DEPS <<<"${PACKAGE_DEPS}\034"
         ALLDEPS+=("${PACKAGE_DEPS[@]}")
     done
 
