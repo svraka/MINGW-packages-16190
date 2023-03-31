@@ -11,10 +11,10 @@ MINGW_PACKAGES=$(get_recursive_package_makedeps emacs | sed -e "s/$MINGW_PACKAGE
 generate_filter_file() {
     echo "- /distrib"
     echo "- /msys"
-    for p in $MINGW_EXCLUDED_ENVIRONMENTS; do echo "- /mingw/$p"; done
-    for p in $MINGW_PACKAGES; do echo "+ **/mingw*-$p-*.zst"; done
-    for p in $MINGW_INCLUDED_ENVIRONMENTS; do echo "- /mingw/$p/*"; done
     echo "- *.sig"
+    for p in $MINGW_EXCLUDED_ENVIRONMENTS; do echo "- /mingw/$p"; done
+    for p in $MINGW_PACKAGES; do echo "+ **/mingw*-$p-*.tar.*"; done
+    for p in $MINGW_INCLUDED_ENVIRONMENTS; do echo "- /mingw/$p/*"; done
 }
 
 TEMPFILE=$(mktemp)

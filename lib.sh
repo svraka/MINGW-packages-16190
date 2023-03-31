@@ -89,11 +89,13 @@ install_packages_from_current_revision() {
     for p in $PACKAGES; do
         p=$(translate_provides "$p")
         VERSION=$(get_package_version "$p")
-        TARBALL=$(printf "%s/mingw%s/%s-$p-%s-any.pkg.tar.zst" "$MSYS2_REPO" "$MINGW_PREFIX" "$MINGW_PACKAGE_PREFIX" "$VERSION")
-        if [ -e "$TARBALL" ]; then
-            PACKAGE_TARBALLS+=("$TARBALL")
+        TARBALL=$(printf "%s/mingw%s/%s-$p-%s-any.pkg.tar" "$MSYS2_REPO" "$MINGW_PREFIX" "$MINGW_PACKAGE_PREFIX" "$VERSION")
+        if [ -e "${TARBALL}.zst" ]; then
+            PACKAGE_TARBALLS+=("${TARBALL}.zst")
+        elif [ -e "${TARBALL}.xz" ]; then
+            PACKAGE_TARBALLS+=("${TARBALL}.xz")
         else
-            echo "Tarball not found: $TARBALL"
+            echo "Tarball not found: ${TARBALL}.{zst,xz}"
             exit 125
         fi
     done
