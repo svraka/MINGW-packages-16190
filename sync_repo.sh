@@ -20,7 +20,7 @@ generate_filter_file() {
 TEMPFILE=$(mktemp)
 generate_filter_file > "$TEMPFILE"
 
-RSYNC_ARGS=(-rlptH --safe-links --delete-delay --delay-updates
+RSYNC_ARGS=(-rlptH --safe-links --delay-updates
             --human-readable --verbose --progress
             --filter="merge $TEMPFILE")
 if [ "$1" == "--dry-run" ]; then
