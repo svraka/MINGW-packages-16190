@@ -9,11 +9,15 @@ popd () {
 get_pkgbuild_name() {
     PACKAGE="$1"
     case $PACKAGE in
+        cc|gcc|gcc-libs|libgccjit)
+            if [[ "${MINGW_PREFIX}" =~ /clang.* ]]; then
+                PACKAGE="clang"
+            else
+                PACKAGE="gcc"
+            fi
+            ;;
         crt)
             PACKAGE="crt-git"
-            ;;
-        gcc-libs|libgccjit|cc)
-            PACKAGE="gcc"
             ;;
         libwinpthread-git|libwinpthread|winpthreads)
             PACKAGE="winpthreads-git"
@@ -28,20 +32,31 @@ get_pkgbuild_name() {
     echo "$PACKAGE"
 }
 
-translate_provides() {
+resolve_provides() {
     PACKAGE="$1"
-    case $PACKAGE in
-        cc)
-            PACKAGE="gcc"
-            ;;
-        crt|libtre|libwinpthread|winpthreads)
-            PACKAGE="${PACKAGE}-git"
-            ;;
-        *)
-            PACKAGE=$PACKAGE
-            ;;
-    esac
-    echo "$PACKAGE"
+    if [[ "${p}" =~ ${MINGW_PACKAGE_PREFIX}-* ]]; then
+        PACKAGE_BASE="${PACKAGE#${MINGW_PACKAGE_PREFIX}-}"
+        case $PACKAGE_BASE in
+            cc)
+                if [[ "${MINGW_PREFIX}" =~ /clang.* ]]; then
+                    PACKAGE_BASE="clang"
+                else
+                    PACKAGE_BASE="gcc"
+                fi
+                ;;
+            crt|libtre|libwinpthread|winpthreads)
+                PACKAGE_BASE="${PACKAGE_BASE}-git"
+                ;;
+            *)
+                PACKAGE_BASE=$PACKAGE_BASE
+                ;;
+        esac
+        PACKAGE_CLEAN="${MINGW_PACKAGE_PREFIX}-${PACKAGE_BASE}"
+    else
+        PACKAGE_CLEAN="${PACKAGE}"
+    fi
+
+    echo "$PACKAGE_CLEAN"
 }
 
 get_pkgbuild_file() {
@@ -52,10 +67,18 @@ get_pkgbuild_file() {
 
 get_package_makedeps() {
     PKGBUILD=$(get_pkgbuild_file "$1")
-    MAKEDEPS=$(source "$PKGBUILD" && MAKEDEPS=("${depends[@]}" "${makedepends[@]}") && echo "${MAKEDEPS[@]}" | tr ' ' '\n')
-    # Let's not deal with MSYS packages
-    MAKEDEPS=$(echo "${MAKEDEPS}" | grep "^${MINGW_PACKAGE_PREFIX}-")
-    echo "${MAKEDEPS}"
+    MAKEDEPS=($(source "$PKGBUILD" && MAKEDEPS=("${depends[@]}" "${makedepends[@]}") && echo "${MAKEDEPS[@]}"))
+
+    declare -a MAKEDEPS_CLEAN
+    for p in "${MAKEDEPS[@]}"; do
+        p=$(resolve_provides "$p")
+        # Let's not deal with MSYS packages
+        if [[ "${p}" =~ ${MINGW_PACKAGE_PREFIX}-* ]]; then
+            MAKEDEPS_CLEAN+=("$p")
+        fi
+    done
+
+    printf '%s\n' "${MAKEDEPS_CLEAN[@]}"
 }
 
 get_recursive_package_makedeps() {
@@ -73,8 +96,14 @@ get_recursive_package_makedeps() {
     ALLDEPS=$(echo "$ALLDEPS" | grep "^${MINGW_PACKAGE_PREFIX}-")
     # Remove version reqs
     ALLDEPS=$(echo "$ALLDEPS" | sed -e "s/[=<>].\+//g")
-    ALLDEPS=$(echo "${ALLDEPS}" | sort | uniq)
-    echo "${ALLDEPS}"
+    declare -a ALLDEPS_CLEAN
+    for p in ${ALLDEPS}; do
+        p=$(resolve_provides "${p}")
+        ALLDEPS_CLEAN+=("${p}")
+    done
+    ALLDEPS_CLEAN=$(printf '%s\n' "${ALLDEPS_CLEAN[@]}")
+    ALLDEPS_CLEAN=$(echo "${ALLDEPS_CLEAN}" | sort | uniq)
+    echo "${ALLDEPS_CLEAN}"
 }
 
 get_package_version() {
@@ -87,7 +116,7 @@ install_packages_from_current_revision() {
     PACKAGES="$1"
     declare -a PACKAGE_TARBALLS
     for p in $PACKAGES; do
-        p=$(translate_provides "$p")
+        p=$(resolve_provides "$p")
         VERSION=$(get_package_version "$p")
         TARBALL=$(printf "%s/mingw%s/%s-$p-%s-any.pkg.tar" "$MSYS2_REPO" "$MINGW_PREFIX" "$MINGW_PACKAGE_PREFIX" "$VERSION")
         if [ -e "${TARBALL}.zst" ]; then

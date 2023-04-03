@@ -6,15 +6,15 @@ SCRIPT_DIR="$(cd "$SCRIPT_DIR" && pwd)" # absolutized and normalized
 source "${SCRIPT_DIR}/.env"
 source "${SCRIPT_DIR}/lib.sh"
 
-MINGW_PACKAGES=$(get_recursive_package_makedeps emacs | sed -e "s/$MINGW_PACKAGE_PREFIX-//g")
+MINGW_PACKAGES=$(get_recursive_package_makedeps emacs)
 
 generate_filter_file() {
     echo "- /distrib"
     echo "- /msys"
     echo "- *.sig"
-    for p in $MINGW_EXCLUDED_ENVIRONMENTS; do echo "- /mingw/$p"; done
-    for p in $MINGW_PACKAGES; do echo "+ **/mingw*-$p-*.tar.*"; done
-    for p in $MINGW_INCLUDED_ENVIRONMENTS; do echo "- /mingw/$p/*"; done
+    for p in $MINGW_PACKAGES; do echo "+ /mingw${MINGW_PREFIX}/${p}-*.tar.*"; done
+    echo "+ */"
+    echo "- *"
 }
 
 TEMPFILE=$(mktemp)
