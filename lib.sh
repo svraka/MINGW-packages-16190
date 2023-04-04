@@ -10,14 +10,23 @@ popd () {
 
 get_pkgbuild_name() {
     PACKAGE="$1"
-    case $PACKAGE in
-        cc|gcc|gcc-libs|libgccjit)
-            if [[ "${MINGW_PREFIX}" =~ /clang.* ]]; then
+    if [[ "${MINGW_PREFIX}" =~ /clang.* ]]; then
+        case $PACKAGE in
+            cc|clang|clang-analyzer|clang-tools-extra|compiler-rt|gcc-compat|lld|llvm)
                 PACKAGE="clang"
-            else
+                ;;
+            gcc-libs|libunwind)
+                PACKAGE="libc++"
+                ;;
+        esac
+    else
+        case $PACKAGE in
+            cc|gcc|gcc-libs|libgccjit)
                 PACKAGE="gcc"
-            fi
-            ;;
+                ;;
+        esac
+    fi
+    case $PACKAGE in
         crt)
             PACKAGE="crt-git"
             ;;
@@ -26,9 +35,6 @@ get_pkgbuild_name() {
             ;;
         libtre)
             PACKAGE="libtre-git"
-            ;;
-        *)
-            PACKAGE=$PACKAGE
             ;;
     esac
     echo "$PACKAGE"
@@ -44,6 +50,11 @@ resolve_provides() {
                     PACKAGE_BASE="clang"
                 else
                     PACKAGE_BASE="gcc"
+                fi
+                ;;
+            gcc-libs)
+                if [[ "${MINGW_PREFIX}" =~ /clang.* ]]; then
+                    PACKAGE_BASE="libc++"
                 fi
                 ;;
             crt|libtre|libwinpthread|winpthreads)
