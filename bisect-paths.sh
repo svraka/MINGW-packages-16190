@@ -10,7 +10,7 @@ list_paths() {
     PACKAGE="$1"
     PACKAGES=$(get_recursive_package_makedeps "$PACKAGE" | sed -e "s/${MINGW_PACKAGE_PREFIX}-//g")
     read -d "\034" -r -a PACKAGES <<<"${PACKAGES}\034"
-    declare -a PKGBUILDS
+    PKGBUILDS=($(get_pkgbuild_file "$PACKAGE"))
     for p in "${PACKAGES[@]}"; do
         p=$(get_pkgbuild_file "$p")
         PKGBUILDS+=("$p")
