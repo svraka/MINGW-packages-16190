@@ -20,7 +20,7 @@ test_emacs() {
     fi
     if [ ! -e "$EMACS_BIN" ]; then
         echo "$EMACS_BIN does not exist" >&2
-        return 255
+        return 127
     fi
     ELISP_TEST_OUTPUT=res
 
