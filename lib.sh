@@ -141,7 +141,7 @@ install_packages_from_current_revision() {
             exit 125
         fi
     done
-    printf '%s\n' "${PACKAGE_TARBALLS[@]}" | sort | uniq | pacman -U --noconfirm --nodeps --nodeps -
+    printf '%s\n' "${PACKAGE_TARBALLS[@]}" | sort | uniq | pacman -U --noprogressbar --noconfirm --nodeps --nodeps -
 }
 
 install_current_makedeps() {

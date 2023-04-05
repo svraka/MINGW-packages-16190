@@ -7,6 +7,7 @@ source "${SCRIPT_DIR}/.env"
 source "${SCRIPT_DIR}/lib.sh"
 
 build_emacs() {
+    echo "Compiling Emacs..." >&2
     pushd "mingw-w64-emacs"
     makepkg-mingw --force --log &> /dev/null
     popd
@@ -24,6 +25,7 @@ test_emacs() {
     fi
     ELISP_TEST_OUTPUT=res
 
+    echo "Testing Emacs..." >&2
     pushd "$SCRIPT_DIR"
     rm -f "$ELISP_TEST_OUTPUT"
     $EMACS_BIN --quick --batch --load test.el --funcall test-subprocesses
