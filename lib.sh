@@ -137,7 +137,7 @@ install_packages_from_current_revision() {
         elif [ -e "${TARBALL}.xz" ]; then
             PACKAGE_TARBALLS+=("${TARBALL}.xz")
         else
-            echo "Tarball not found: ${TARBALL}.{zst,xz}"
+            echo "Tarball not found: ${TARBALL}.{zst,xz}" >&2
             exit 125
         fi
     done
